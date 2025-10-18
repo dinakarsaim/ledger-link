@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String        @id @default(uuid())
+  email      String        @unique
+  password   String
+  name       String?
+  createdAt  DateTime      @default(now())
+  groupsOwned Group[]      @relation("GroupOwner")
+  memberships GroupMember[]
+  receipts   Receipt[]
+  expenses   Expense[]     @relation("Payer")
+  splits     ExpenseSplit[]            // <-- opposite relation for ExpenseSplit.user
+}
+
+model Group {
+  id        String       @id @default(uuid())
+  name      String
+  ownerId   String
+  owner     User         @relation("GroupOwner", fields: [ownerId], references: [id])
+  members   GroupMember[]
+  createdAt DateTime     @default(now())
+}
+
+model GroupMember {
+  id      String @id @default(uuid())
+  group   Group  @relation(fields: [groupId], references: [id])
+  groupId String
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  role    String @default("member")
+}
+
+model Receipt {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  groupId   String?
+  imageUrl  String?
+  ocrText   String?  @db.Text
+  parsed    Json?
+  createdAt DateTime @default(now())
+  expense   Expense? @relation("ReceiptExpense") // optional one-to-one
+}
+
+model Expense {
+  id           String        @id @default(uuid())
+  receipt      Receipt?      @relation("ReceiptExpense", fields: [receiptId], references: [id])
+  receiptId    String?       @unique  // <-- must be unique for one-to-one
+  payer        User          @relation("Payer", fields: [payerId], references: [id])
+  payerId      String
+  totalAmount  Decimal       @db.Decimal(10, 2)
+  currency     String        @default("INR")
+  description  String?
+  splits       ExpenseSplit[]
+  createdAt    DateTime      @default(now())
+}
+
+model ExpenseSplit {
+  id          String   @id @default(uuid())
+  expense     Expense  @relation(fields: [expenseId], references: [id])
+  expenseId   String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
+  amount      Decimal  @db.Decimal(10, 2)
+  shareMethod String
+  settled     Boolean  @default(false)
+}
