@@ -6,6 +6,8 @@ import Register from "./pages/auth/Register";
 import Home from "./pages/app/Home";
 import Dashboard from "./pages/app/Dashboard";
 import UploadReceipt from "./pages/app/UploadReceipt";
+import ReceiptReview from "./pages/app/ReceiptReview";
+
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { user, loading } = useAuth();
@@ -56,6 +58,15 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <UploadReceipt />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/receipts/:id/review"
+            element={
+              <ProtectedRoute>
+                <ReceiptReview />
               </ProtectedRoute>
             }
           />
