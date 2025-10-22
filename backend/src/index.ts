@@ -8,6 +8,7 @@ import authRouter from "./routes/auth";
 import meRouter from "./routes/me";
 import receiptsRouter from "./routes/receipts";
 import expenseRoutes from "./routes/expenses";
+import groupRoutes from "./routes/groups";
 
 
 dotenv.config();
@@ -32,10 +33,7 @@ app.get("/api/health", (req, res) => res.json({ ok: true, time: new Date().toISO
 app.use("/api/auth", authRouter);
 app.use("/api/receipts", receiptsRouter);
 app.use("/api/expenses", expenseRoutes);
-
-// placeholder for future routes
-// app.use("/api/receipts", receiptsRouter);
-
+app.use("/api/groups", groupRoutes);
 app.use("/api/me", meRouter);
 
 const port = process.env.PORT || 5000;

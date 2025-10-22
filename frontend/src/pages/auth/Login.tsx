@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
@@ -29,6 +29,12 @@ export default function Login() {
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" className="w-full p-2 border rounded" />
         <button className="w-full py-2 bg-primary text-white rounded">Login</button>
       </form>
+      <div className="text-sm text-gray-600 mt-4 text-center">
+        Don’t have an account?{" "}
+        <Link to="/register" className="text-primary font-medium hover:underline">
+          Register here
+        </Link>
+      </div>
     </div>
   );
 }
