@@ -8,25 +8,27 @@ datasource db {
 }
 
 model User {
-  id         String        @id @default(uuid())
-  email      String        @unique
-  password   String
-  name       String?
-  createdAt  DateTime      @default(now())
-  groupsOwned Group[]      @relation("GroupOwner")
+  id          String         @id @default(uuid())
+  email       String         @unique
+  password    String
+  name        String?
+  createdAt   DateTime       @default(now())
+  groupsOwned Group[]        @relation("GroupOwner")
   memberships GroupMember[]
-  receipts   Receipt[]
-  expenses   Expense[]     @relation("Payer")
-  splits     ExpenseSplit[]            // <-- opposite relation for ExpenseSplit.user
+  receipts    Receipt[]
+  expenses    Expense[]      @relation("Payer")
+  splits      ExpenseSplit[] // <-- opposite relation for ExpenseSplit.user
 }
 
 model Group {
-  id        String       @id @default(uuid())
+  id        String        @id @default(uuid())
   name      String
   ownerId   String
-  owner     User         @relation("GroupOwner", fields: [ownerId], references: [id])
+  owner     User          @relation("GroupOwner", fields: [ownerId], references: [id])
   members   GroupMember[]
-  createdAt DateTime     @default(now())
+  createdAt DateTime      @default(now())
+
+  expenses Expense[]
 }
 
 model GroupMember {
@@ -51,25 +53,27 @@ model Receipt {
 }
 
 model Expense {
-  id           String        @id @default(uuid())
-  receipt      Receipt?      @relation("ReceiptExpense", fields: [receiptId], references: [id])
-  receiptId    String?       @unique  // <-- must be unique for one-to-one
-  payer        User          @relation("Payer", fields: [payerId], references: [id])
-  payerId      String
-  totalAmount  Decimal       @db.Decimal(10, 2)
-  currency     String        @default("INR")
-  description  String?
-  splits       ExpenseSplit[]
-  createdAt    DateTime      @default(now())
+  id          String         @id @default(uuid())
+  receipt     Receipt?       @relation("ReceiptExpense", fields: [receiptId], references: [id])
+  receiptId   String?        @unique // <-- must be unique for one-to-one
+  payer       User           @relation("Payer", fields: [payerId], references: [id])
+  payerId     String
+  totalAmount Decimal        @db.Decimal(10, 2)
+  currency    String         @default("INR")
+  description String?
+  splits      ExpenseSplit[]
+  createdAt   DateTime       @default(now())
+  group       Group?         @relation(fields: [groupId], references: [id])
+  groupId     String?
 }
 
 model ExpenseSplit {
-  id          String   @id @default(uuid())
-  expense     Expense  @relation(fields: [expenseId], references: [id])
+  id          String  @id @default(uuid())
+  expense     Expense @relation(fields: [expenseId], references: [id])
   expenseId   String
-  user        User     @relation(fields: [userId], references: [id])
+  user        User    @relation(fields: [userId], references: [id])
   userId      String
-  amount      Decimal  @db.Decimal(10, 2)
+  amount      Decimal @db.Decimal(10, 2)
   shareMethod String
-  settled     Boolean  @default(false)
+  settled     Boolean @default(false)
 }
